@@ -21,7 +21,7 @@ This dissertation is about MSc project which is related to a [Secure E2EE Chat S
    + 介绍读者需要理解解决方案的知识背景（Signal Protocol，WhatsApp）
    + 将项目与已存在的工作进行比较
 
-4. Upgrade chat system with Signal Protocol
+4. Implementation
    + Analysis and specification
      + 最初如何分析的问题（用户需求）
      + 介绍解决方案
