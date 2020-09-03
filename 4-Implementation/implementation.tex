@@ -24,14 +24,14 @@ The first function that needs alteration is the pairwise chat. The pairwise chat
 The group chat is relatively complicated because of the multiple members. Assume there is a group chat containing N members. If the system adopts the program that each member creates a pairwise chat with every other one in the group, on each member's client side there will be N-1 pairwise chats. Every time the user wants to send some messages in the group, the user must do N-1 times Double Ratchet steps to encrypt different encrypted messages corresponding to the different receivers. Which means sending one message needs to do N-1 times encryptions. Besides storing all members' ratchet states is also space consuming. So this design causes large loss in time and space. The figure 4.1 presents the process of this design.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.5]{../4-Implementation/resources/Figure4-1.png}\\
 Figure 4.1: \textit{Implementing group chat by creating the pairwise chats between each other}
 \end{center}
 
 Fortunately, existing related product like WhatsApp \citep{GroupChat1} and papers \citep{GroupChat} have already given the solution. Because of the high security feature of Signal Protocol in pairwise chat, members can exchange their chain keys via pairwise way. When the group chat is initializing, each member needs to generate a sending chain key as the second ratchet in Double Ratchet. Then they should use the pairwise chat to exchange their sending chain key with every other one in the group. After initialization, on each member's side there are only N-1 sending chain of others and one own sending chain. Every time the user wants to send some messages in the group, the user only needs to do a stepping on his own sending chain and get the correct message key for encryption which means one message only needs one encryption. For the receivers, they just need to find the correct sending chain corresponding to the sender and do the correct stepping to get the message key for decryption. This design is much better in time and space cost then the former. The figure 4.2 is the schematic diagram of it.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.5]{../4-Implementation/resources/Figure4-2.png}\\
 Figure 4.2: \textit{Implementing group chat by exchanging sender keys with each other}
 \end{center}
 
@@ -40,7 +40,7 @@ Figure 4.2: \textit{Implementing group chat by exchanging sender keys with each 
 Switching device is an important function in a chat system. It allows users to get continuous using experience while changing their device. Because the Signal Protocol requires each account generates the unique key bundle for communication and the confidentiality of the private keys is the precondition of the chat's security. So to some extent, Signal Protocol is device-oriented. User's each device needs to generate a unique key bundle as a new account. In this system, there should be a new customize class User containing the username and deviceId fields, which means one user can have several accounts with same username but different deviceId \citep{MultiDevice}. The figure 4.3 shows the user information structure in multi-device system.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.5]{../4-Implementation/resources/Figure4-3.png}\\
 Figure 4.3: \textit{The user information structure in multi-device system}
 \end{center}
 
@@ -57,7 +57,7 @@ As for the consideration of message backup, the traditional message backup funct
 In the implementation of message backup, the multi-device system adds a field variable named active while login. The user could only have one active account at the same time. If the account which is logging in was not active previously but would be active now, the multi-device system would update user's active account information to complete the device switch operation. When the account which is logging in was inactive previously and would not be activated now, the account could send the backup messages to the active account of the user. The figure 4.4 has an overview about the login handle in multi-device system.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.5]{../4-Implementation/resources/Figure4-4.png}\\
 Figure 4.4: \textit{The login handle in multi-device system}
 \end{center}
 
@@ -83,7 +83,7 @@ In the logout function, since the client stores history messages at local, there
 There are only two tables in the database, the Users table and KeyBundles table. To be compatible with the multi-device system, the User table is required to add a new field deviceId. The KeyBundles table contains the key bundles associated with corresponding users. Since the history chat data is not saved in database any more, the ChatData and Session table can be dropped. Figure 4.5 presents the table structure of Users and KeyBundles tables.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.4]{../4-Implementation/resources/Figure4-5.png}\\
 Figure 4.5: \textit{The structure of Users and KeyBundles tables}
 \end{center}
 
@@ -135,7 +135,7 @@ To construct a Signal compatible server, the server is supposed to have the abil
 This system uses socket programming to implement the communication between the server and the client. There is a common class on both server and client side called ConnectionData representing the package data during connection. This class must be same on both sides or it will be serialized to the bytes that the other side cannot deserialize. Both client and server process the data reception by an independent thread. Once the party received a connectionData, it will deserialize the connectionData first and then do some operations corresponds to the type of data. The figure 4.6 presents the structure of ConnectionData and the process of communication between the server and client.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.3]{../4-Implementation/resources/Figure4-6.png}\\
 Figure 4.6: \textit{The process of communication between the server and client}
 \end{center}
 
@@ -169,12 +169,12 @@ The testing of this system can be divided into two parts: junit testing and blac
 The junit tests cover the functions including the Signal encryption, javaFx rendering logic and jdbc executions etc. All the junit tests are passed both in the server and client. Figure 4.7 and figure 4.8 present the testing reports generated by gradle in the server and client.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/client-report.png}\\
 Figure 4.7: \textit{The testing report of junit tests in the client}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/server-report.png}\\
 Figure 4.8: \textit{The testing report of junit tests in the server}
 \end{center}
 
@@ -186,12 +186,12 @@ The black-box testing mainly tests the pairwise chat, group chat function and pa
 In the synchronous environment, Alice and Bob are both online. First Alice initializes the pairwise chat with Bob, after the shown of waiting alert, Alice could send messages to the Bob. The figure 4.9 and figure 4.10 present the initialization and chatting of pairwise chat respectively.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/pairwise-init.png}\\
 Figure 4.9: \textit{The initialization testing of pairwise chat}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/pairwise-chat.png}\\
 Figure 4.10: \textit{The chatting testing of pairwise chat}
 \end{center}
 
@@ -202,12 +202,12 @@ In the asynchronous environment, only Alice is online while Bob is offline. Alic
 For the purpose of testing group chat in synchronous environment, Alice, Bob and Cathy are supposed to be online at the same time. While group chatting, the creator of the group chat Alice should request other's key bundles first for secure connection with them. Then generation and distribution of sender key is required. After the shown of waiting alert, Alice can send messages to the members. On Bob and Cathy sides, once they received the sender key from Alice, the initialization of the group chat starts in the meanwhile as Alice does. Then all the members could chat in the group. The figure 4.11 and figure 4.12 present the initialization and chatting of group chat respectively.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/group-init.png}\\
 Figure 4.11: \textit{The initialization testing of group chat}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/group-chat.png}\\
 Figure 4.12: \textit{The chatting testing of group chat}
 \end{center}
 
@@ -218,12 +218,12 @@ In the asynchronous environment, Cathy is required to log out first, Then Alice 
 The stability of chat after switching device is essential in the multi-device system. To test if both pairwise chat and group chat could work correctly after switching devices, there is a pairwise chat and a group chat created already. Alice has a pairwise chat with Bob and a group chat with Bob and Cathy. First Bob is required to log out and register a new account with deviceId 2. After the reinitialization, both pairwise chat and group chat are supposed to work correctly including receiving and sending messages. The figure 4.13 and figure 4.14 present the reinitialization and chatting in this situation.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/group-init-re.png}\\
 Figure 4.13: \textit{The reinitialization of group chat after switching the device}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/group-chat-re.png}\\
 Figure 4.14: \textit{The chatting of group chat after switching the device}
 \end{center}
 
@@ -232,12 +232,12 @@ Figure 4.14: \textit{The chatting of group chat after switching the device}
 The testing pairwise chat fingerprint verification between Alice and Bob requires there is an already created pairwise chat between them. After clicking the verify button on both Alice and Bob sides, the information alert including the fingerprint of the chat is shown in the client. The figure 4.15 and figure 4.16 present the result of this function.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/fingerprint-Alice.png}\\
 Figure 4.15: \textit{The fingerprint of pairwise chat on Alice side}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.45]{../4-Implementation/resources/fingerprint-Bob.png}\\
 Figure 4.16: \textit{The fingerprint of pairwise chat on Bob side}
 \end{center}
 
@@ -254,12 +254,12 @@ Commit records of git is also useful during developing. Make sure every steps is
 After all the implementation of new functions in the whole system, the chat system is upgraded to a secure E2EE chat system. The features of it include the pairwise chat, group chat, switching device and messages backup etc. Users could communicate with each other in secure based on Signal Protocol. To verify the Signal Protocol works correctly in this system, the message key obtained from the symmetric ratchet is printed in client after each encryption and decryption. Comparing two message keys of two parties is a clear proof of the implementation of Signal Protocol. The figure 4.17 and figure 4.18 present the printed message keys of one pairwise chat's two parties respectively.
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.55]{../4-Implementation/resources/key-sender.png}\\
 Figure 4.17: \textit{The message key after encryption on sender side}
 \end{center}
 
 \begin{center}
-\includegraphics[scale=.5]{../3-Background/resources/DH-rece.png}\\
+\includegraphics[scale=.55]{../4-Implementation/resources/key-receiver.png}\\
 Figure 4.18: \textit{The message key after decryption on receiver side}
 \end{center}
 
